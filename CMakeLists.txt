@@ -35,10 +35,14 @@ pico_sdk_init()
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(Display Display.c )
+add_executable(Display Display.c ssd1306.c)
 
 pico_set_program_name(Display "Display")
 pico_set_program_version(Display "0.1")
+
+# # Generate PIO header
+pico_generate_pio_header(Display ${CMAKE_CURRENT_LIST_DIR}/ws2812.pio)
+
 
 # Modify the below lines to enable/disable output over UART/USB
 pico_enable_stdio_uart(Display 1)
@@ -55,7 +59,10 @@ target_include_directories(Display PRIVATE
 
 # Add any user requested libraries
 target_link_libraries(Display 
-        
+    hardware_i2c    
+    hardware_pio
+    hardware_clocks
+    hardware_pwm
         )
 
 pico_add_extra_outputs(Display)
