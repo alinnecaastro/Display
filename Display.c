@@ -20,7 +20,8 @@
 #define I2C_SCL 15
 #define endereco 0x3C
 
-
+bool led_verde = false;
+bool led_azul = false;
 
 //Função principal
 int main() {
@@ -59,48 +60,91 @@ int main() {
     //Limpa o display
     ssd1306_fill(&ssd, false);
     ssd1306_send_data(&ssd);
-    bool cor = true;
+
 
     while(1){
- 
+
     sleep_ms(1000);
-    led_vermelho(); // Acende o LED vermelho
 
         // Processa botão A
         if (flag_button_a) {
-            contador = (contador + 1) % 10;
-            printf("Contador: %d\n", contador);
-            mostrar_numero(contador);
+            led_verde =!led_verde;
             flag_button_a = false;
         }
-
         // Processa botão B
         if (flag_button_b) {
-            contador = (contador == 0) ? 9 : contador - 1;
-            printf("Contador: %d\n", contador);
-            mostrar_numero(contador);
+            led_azul = !led_azul;
             flag_button_b = false;
         }
-// Leitura de caracteres via UART
+           
+
+            if(led_verde && led_azul){
+                gpio_put(GPIO_PIN_GREEN,1);
+                gpio_put(GPIO_PIN_BLUE, 1);
+                gpio_put(GPIO_PIN_RED, 0);
+            }
+            else if(led_verde){
+            gpio_put(GPIO_PIN_GREEN,1);
+            gpio_put(GPIO_PIN_BLUE, 0);
+            gpio_put(GPIO_PIN_RED, 0);
+            }
+            else if(led_azul){
+            gpio_put(GPIO_PIN_GREEN,0);
+            gpio_put(GPIO_PIN_BLUE, 1);
+            gpio_put(GPIO_PIN_RED, 0);
+            }
+            else{
+            gpio_put(GPIO_PIN_GREEN,0);
+            gpio_put(GPIO_PIN_BLUE, 0);
+            gpio_put(GPIO_PIN_RED, 0);
+            }
+            
+        ssd1306_fill(&ssd, false);//Limpa o display
+        ssd1306_send_data(&ssd);
+        // Exibe os status de ambos os LEDs no display
+        ssd1306_fill(&ssd,false);
+        ssd1306_draw_string(&ssd,"LEDS ",20,15);
+        ssd1306_draw_string(&ssd, "LED verde: ", 20, 30);
+        if (led_verde) {
+            ssd1306_draw_string(&ssd, "ON", 100, 30); // LED verde está ligado
+        } else {
+            ssd1306_draw_string(&ssd, "OFF", 100, 30); // LED verde está desligado
+        }
+        ssd1306_draw_string(&ssd, "LED azul: ", 20, 50);
+        if (led_azul) {
+            ssd1306_draw_string(&ssd, "ON", 100, 50); // LED azul está ligado
+        } else {
+            ssd1306_draw_string(&ssd, "OFF", 100, 50); // LED azul está desligado
+        }
+        ssd1306_send_data(&ssd); // Atualiza o display
+        ssd1306_fill(&ssd,false);
+
+    // Leitura de caracteres via UART
         int c = getchar_timeout_us(0); // Lê um caractere do Serial Monitor
         if (c != PICO_ERROR_TIMEOUT) {
             // Limpa o display antes de exibir o novo caractere
             ssd1306_fill(&ssd, false);
+            
 
             // Exibe o caractere no display SSD1306
-            ssd1306_draw_char(&ssd, c, 10, 10);
+            ssd1306_draw_char(&ssd, c, 20, 30);
             ssd1306_send_data(&ssd);
 
             // Verifica se o caractere é um número (0-9)
             if (c >= '0' && c <= '9') {
                 int number = c - '0'; // Converte o caractere para um número
                 mostrar_numero(number); // Exibe o símbolo correspondente na matriz WS2812
+            }else
+            if(c == '#'){
+                npClear();
+                npWrite(NULL,0);
             }
         }
 
         tight_loop_contents(); // Otimiza o loop principal
     }
 }
+
 
  
     
