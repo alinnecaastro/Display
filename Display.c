@@ -70,7 +70,7 @@ int main() {
     ssd1306_fill(&ssd, false);
     // Envia os dados configurados para o display
     ssd1306_send_data(&ssd);
-
+    printf("OFF");
 
     while(1){
 
@@ -114,16 +114,21 @@ int main() {
         // Exibe os status de ambos os LEDs no display
         ssd1306_fill(&ssd,false); //Limpa o display
         ssd1306_draw_string(&ssd,"LEDS ",20,15);//Desenha uma string no display
+        
         ssd1306_draw_string(&ssd, "LED verde: ", 20, 30);
         if (led_verde) {
+           
             ssd1306_draw_string(&ssd, "ON", 100, 30); // LED verde está ligado
         } else {
+           
             ssd1306_draw_string(&ssd, "OFF", 100, 30); // LED verde está desligado
         }
         ssd1306_draw_string(&ssd, "LED azul: ", 20, 50);
         if (led_azul) {
+            
             ssd1306_draw_string(&ssd, "ON", 100, 50); // LED azul está ligado
         } else {
+            
             ssd1306_draw_string(&ssd, "OFF", 100, 50); // LED azul está desligado
         }
         ssd1306_send_data(&ssd); // Atualiza o display
