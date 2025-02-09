@@ -70,7 +70,7 @@ int main() {
     ssd1306_fill(&ssd, false);
     // Envia os dados configurados para o display
     ssd1306_send_data(&ssd);
-    printf("OFF");
+    
 
     while(1){
 
